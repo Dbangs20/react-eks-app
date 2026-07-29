@@ -54,9 +54,14 @@ pipeline {
         }
         stage('Deploy to Amazon EKS') {
             steps {
-                sh "aws eks update-kubeconfig --region eu-north-1 --name react-app-eks-cluster"
-                sh "sed -i 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml"
-                sh "kubectl apply -f k8s/"
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-secret-id'
+                ]]) {
+                    sh "aws eks update-kubeconfig --region eu-north-1 --name react-app-eks-cluster"
+                    sh "sed -i 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml"
+                    sh "kubectl apply -f k8s/"
+                }
             }
         }
         stage('Verify Rollout') {
