@@ -27,9 +27,11 @@ pipeline {
         }
         stage('SonarQube Code Scan') {
             steps {
-                scannerHome = tool 'SonarQubeServer'
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=react-eks-app -Dsonar.sources=src"
+                script {
+                    def scannerHome = tool 'SonarQubeServer'
+                    withSonarQubeEnv('SonarQubeServer') {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=react-eks-app -Dsonar.sources=src"
+                    }
                 }
             }
         }
